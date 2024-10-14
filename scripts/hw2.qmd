@@ -1,0 +1,102 @@
+---
+title: "Differences-in-Differences Causal Analysis of a Fishery Management Reform in Peru"
+author: "Natalie Smith"
+format: 
+  html:
+    code-fold: true
+    toc: true
+    number-sections: true
+    embed-resources: true
+theme: Litera
+editor: visual
+execute:
+  echo: true
+  message: false
+  warning: false
+---
+
+In this homework you will conduct a differences-in-differences causal analysis of a fishery management reform in Peru. It is inspired by the setting in Natividad (2014), who studied the impact of implementing an IVQ (Individual Vessel Quota) for the Peruvian anchovy fishery. The objectives of this policy were improving stock monitoring, reducing the stock pressure in a short window of time (lower harvest per fishing trip through longer fishing seasons), and creating incentives to avoid over-investment to compete for the resource. You will test whether the policy, which went in place in 2009, had a causal effect on fishery landings.
+
+This homework will walk you through the actual calculations for a differences and differences causal analysis. Please answer all of the questions and keep your responses brief. Please submit your code with your responses (or use R markdown to show both).
+
+# Background
+
+Our target species is the Peruvian anchovy, which has two fishing areas in Peru: the North Center zone and the South zone. In addition, there are two types of fishing fleets: 1. the steel fleet, managed by big corporations, and 2. the “Viking” fleet, managed by small fishermen families. The species is important because it represents 90% of Peru’s maritime landings, and 98% is exported as fishmeal (PRODUCE, 2019). In addition, this sector generates 12,000 jobs. Consequently, conserving the stock is crucial to keep production and employment in the coming decades.
+
+![Figure 1: Arias Schreiber and Halliday, 2013](images/anchovy_map.png){width="384"}
+
+# Prepare data and packages
+
+```{r}
+library(tidyverse)
+library(knitr)
+library(here)
+library(kableExtra)
+```
+
+```{r}
+# Load the data using here package
+anchovy_data <- read_csv(here("data", "df_peru.csv"))
+```
+# Employ Diff-in-Diff 
+
+Create new variable called `log_landing` which is the log(landing)
+
+```{r}
+#create a new variable called log_landing by taking the log of the landings variable
+log_anchovy_data <- anchovy_data %>%
+  mutate(log_landing = log(landing))
+```
+
+Create a dummy variable (call it post) to indicate when the treatment started (year 2009). The variable will be 1 starting in 2009 and tereafter.
+
+```{r}
+#Create a dummy variable called 'post' to indicate when the treatment started (year 2009)
+log_anchovy_data <- log_anchovy_data %>%
+  mutate(post = ifelse(year >= 2009, 1, 0))
+```
+
+Create a dummy variable (call it north) to identify the group exposed to the treamtnet (CN)
+
+```{r}
+#Create a dummy variable called 'north' to identify the group (zone) exposed to the treatment (CN)
+log_anchovy_data <- log_anchovy_data %>% 
+  mutate(north = ifelse(zone=="CN", 1, 0))
+```
+
+Create the interaction between the time the treatment started and the treatment group. Call this variable did.
+
+The interaction between these two factors creates a variable that is 1 only for observations that are both: The observation is in the treatment group and The observation occurs after the treatment started.
+
+```{r}
+#Create the interaction between the time the treatment started and the treatment group
+log_anchovy_data <- log_anchovy_data %>% 
+  mutate(did = post*north)
+```
+
+Run liner regression. Use the functional form proposed above. Show the results in a table.
+
+Functional form:
+
+$$
+Landing_{tg} = \alpha + \beta_0 North_{g} + \beta_1Post_{t} + \beta_3North_{g}Post_{t} + \epsilon_{tg}
+$$
+
+```{r}
+#Run a linear regression using the functional form proposed above
+lm_anchovy <- lm(log_landing ~ north + post + did, data = log_anchovy_data)
+
+```
+
+Main Effects:
+
+You look at each variable separately: How does being in the North affect landings? How does being in the post-treatment period affect landings? Interaction Effect:
+
+You look at how these effects change based on the combination of both variables: Does being in the North have a different effect on landings if it’s the post-treatment period compared to the pre-treatment period?
+
+```{r}
+kable(summary(lm_anchovy)$coefficients, digits = 3, 
+      col.names = c("Estimate", "Std. Error", "T-value", "Pr(>|t|)"), # Rename columns
+      caption = "Linear Model Coefficients for Anchovy Landings")
+```
+# Analysis
