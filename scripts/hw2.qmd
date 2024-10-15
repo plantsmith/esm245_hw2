@@ -16,7 +16,7 @@ execute:
   warning: false
 ---
 
-# Background
+# Background:
 
 In 2009, the Individual Vessel Quota (IVQ) system was implemented for Peruvian anchoveta fisheries in the North-Central zone to enhance stock monitoring, alleviate fishing pressure, and incentivize sustainable practices. This policy allocated each vessel a percentage of the Total Allowable Catch (TAC) based on its historical performance, while also varying seasonally based on biological, weather, and climate variables. Additionally, the system introduced several additional measures, including a seasonal tax on harvested tons, satellite surveillance for better compliance, and designated docks to weight the landing.
 
@@ -24,7 +24,7 @@ We aim to assess whether the IVQ had a causal effect on harvest levels, using th
 
 ![Figure 1: Arias Schreiber and Halliday, 2013](images/anchovy_map.png){fig-align="left" width="384"}
 
-# Prepare data and packages
+# Prepare Libraries & Data: 
 
 ```{r}
 library(tidyverse)
@@ -38,7 +38,7 @@ library(kableExtra)
 anchovy_data <- read_csv(here("data", "df_peru.csv"))
 ```
 
-# Employ Diff-in-Diff Analysis
+# Employ Diff-in-Diff Analysis:
 
 We first created a new variable called 'log_landing' by taking the logarithm of the 'landing' variable. Then, we created two dummy variables: one named 'post' to indicate when the treatment began (1 for 2009 and after, 0 for before), and another variable called 'north' to identify the group exposed to the treatment (1 for NC and 0 for S). Next, we created an interaction between these variables called 'did' (differences-in-differences). This interaction variable is equal to 1 only for observations that are both in the treatment group and occur after the treatment started. Finally, we performed a linear regression based on the functional form below:
 
@@ -73,10 +73,50 @@ kable(summary(lm_anchovy)$coefficients, digits = 3,
       caption = "Linear Model Coefficients for Anchovy Landings")
 ```
 
-# Intrepretation of the DID Coefficients
+# Interpretation of the DiD Coefficients:
 
-Interpret the did coefficient. Remember that we transformed landing by using log. This is your main result, so take a minute to really think about what this estimated coefficient is telling you.
+```{r}
+#calculate percentage change in NC landings
+percentage_change <- exp(coef(lm_anchovy)[4]) - 1
+```
 
-FYI: Fish landings are the total weight or number of marine species that are caught, brought to shore, and sold or transferred to another party.
+The coefficient estimates from the linear regression model indicate the following:
+
+-   The intercept of 4.603 represents the log-transformed value of anchovy landings in the South zone before the policy was implemented.
+-   The coefficient for 'north' of 0.311 indicates that landings in the North Central zone were 31.1% higher than the South zone before the policy was implemented.
+-   After the policy, landings increase by 17.1% in both zones, as shown by the 'post' coefficient of 0.171.
+-   However, the differences-in-differences (DiD) estimate of -0.176 suggests a 17.6% decrease in landings in the NC zone relative to the South zone after the policy.
+-   High T values for all coefficients indicate that the estimates are statistically significant.
+-   While both zones experienced increases in landings, the IVQ policy had a negative impact in the NC zone, reducing landings by 16.2% compared to what might have been expected in the South zone.
 
 # Analysis
+
+### *Question 1:* 
+
+*We used the South as a counterfactual region because the policy wasn’t applied there. Describe one or more possible problems with this assumption.*
+
+There could be other variables at play - for example what if there was a storm in the North that caused a decrease in landings.
+
+What is the landings were decreasing naturally?
+
+### *Question 2:* 
+
+*To analyze whether the counterfactual makes sense, take the mean of log_landing before and after the policy for each zone. Show your results in a table.*
+
+```{r}
+#take the mean of log_landing before and after the policy for each zone
+mean_anchovy_data <- log_anchovy_data %>%
+  group_by(zone, post) %>%
+  summarize(mean_log_landing = mean(log_landing))
+
+#summarize in a kable table
+kable(mean_anchovy_data, digits = 3, 
+      col.names = c("Zone", "Post", "Mean Log Landing"), 
+      caption = "Mean Log Landing Before and After the Policy for Each Zone")
+
+
+```
+
+### *Question 3:* 
+
+*Does the parallel trends assumption seem to hold? What are the implications of this for your analysis*?
