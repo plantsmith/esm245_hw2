@@ -3228,7 +3228,7 @@ window.Quarto = {
   <li><a href="#background" id="toc-background" class="nav-link active" data-scroll-target="#background"><span class="header-section-number">1</span> Background:</a></li>
   <li><a href="#prepare-libraries-data" id="toc-prepare-libraries-data" class="nav-link" data-scroll-target="#prepare-libraries-data"><span class="header-section-number">2</span> Prepare Libraries &amp; Data:</a></li>
   <li><a href="#employ-diff-in-diff-analysis" id="toc-employ-diff-in-diff-analysis" class="nav-link" data-scroll-target="#employ-diff-in-diff-analysis"><span class="header-section-number">3</span> Employ Diff-in-Diff Analysis:</a></li>
-  <li><a href="#interpretation-of-the-did-coefficients" id="toc-interpretation-of-the-did-coefficients" class="nav-link" data-scroll-target="#interpretation-of-the-did-coefficients"><span class="header-section-number">4</span> Interpretation of the DiD Coefficients:</a></li>
+  <li><a href="#interpretation-of-the-did-coefficient" id="toc-interpretation-of-the-did-coefficient" class="nav-link" data-scroll-target="#interpretation-of-the-did-coefficient"><span class="header-section-number">4</span> Interpretation of the DiD Coefficient:</a></li>
   <li><a href="#analysis" id="toc-analysis" class="nav-link" data-scroll-target="#analysis"><span class="header-section-number">5</span> Analysis</a>
   <ul class="collapse">
   <li><a href="#question-1" id="toc-question-1" class="nav-link" data-scroll-target="#question-1"><span class="header-section-number">5.0.1</span> <em>Question 1:</em></a></li>
@@ -3305,7 +3305,7 @@ window.Quarto = {
 <h1 data-number="3"><span class="header-section-number">3</span> Employ Diff-in-Diff Analysis:</h1>
 <p>We first created a new variable called ‘log_landing’ by taking the logarithm of the ‘landing’ variable. Then, we created two dummy variables: one named ‘post’ to indicate when the treatment began (1 for 2009 and after, 0 for before), and another variable called ‘north’ to identify the group exposed to the treatment (1 for NC and 0 for S). Next, we created an interaction between these variables called ‘did’ (differences-in-differences). This interaction variable is equal to 1 only for observations that are both in the treatment group and occur after the treatment started. Finally, we performed a linear regression based on the functional form below:</p>
 <p><span class="math display">\[
-Landing_{tg} = \alpha + \beta_0 North_{g} + \beta_1Post_{t} + \beta_3North_{g}Post_{t} + \epsilon_{tg}
+Landing_{tg} = \alpha + \beta_0 North_{g} + \beta_1Post_{t} + \beta_2North_{g}Post_{t} + \epsilon_{tg}
 \]</span></p>
 <div class="cell">
 <details class="code-fold">
@@ -3328,37 +3328,15 @@ Landing_{tg} = \alpha + \beta_0 North_{g} + \beta_1Post_{t} + \beta_3North_{g}Po
 <span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a><span class="co">#Run a linear regression using the functional form proposed above</span></span>
 <span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>lm_anchovy <span class="ot">&lt;-</span> <span class="fu">lm</span>(log_landing <span class="sc">~</span> north <span class="sc">+</span> post <span class="sc">+</span> did, <span class="at">data =</span> log_anchovy_data) </span>
-<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(lm_anchovy)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a><span class="co"># summary(lm_anchovy)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
-<div class="cell-output cell-output-stdout">
-<pre><code>
-Call:
-lm(formula = log_landing ~ north + post + did, data = log_anchovy_data)
-
-Residuals:
-    Min      1Q  Median      3Q     Max 
--6.3833 -0.7403  0.0665  0.8724  3.2187 
-
-Coefficients:
-            Estimate Std. Error t value Pr(&gt;|t|)    
-(Intercept)  4.60265    0.01477 311.650  &lt; 2e-16 ***
-north        0.31099    0.01745  17.824  &lt; 2e-16 ***
-post         0.17116    0.02087   8.202 2.43e-16 ***
-did         -0.17615    0.02466  -7.144 9.18e-13 ***
----
-Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
-
-Residual standard error: 1.223 on 48404 degrees of freedom
-Multiple R-squared:  0.008073,  Adjusted R-squared:  0.008011 
-F-statistic: 131.3 on 3 and 48404 DF,  p-value: &lt; 2.2e-16</code></pre>
-</div>
 </div>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(<span class="fu">summary</span>(lm_anchovy)<span class="sc">$</span>coefficients, <span class="at">digits =</span> <span class="dv">3</span>, </span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>      <span class="at">col.names =</span> <span class="fu">c</span>(<span class="st">&quot;Estimate&quot;</span>, <span class="st">&quot;Std. Error&quot;</span>, <span class="st">&quot;T-value&quot;</span>, <span class="st">&quot;Pr(&gt;|t|)&quot;</span>),</span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>      <span class="at">caption =</span> <span class="st">&quot;Linear Model Coefficients for Anchovy Landings&quot;</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(<span class="fu">summary</span>(lm_anchovy)<span class="sc">$</span>coefficients, <span class="at">digits =</span> <span class="dv">3</span>, </span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>      <span class="at">col.names =</span> <span class="fu">c</span>(<span class="st">&quot;Coefficient&quot;</span>, <span class="st">&quot;Std. Error&quot;</span>, <span class="st">&quot;T-value&quot;</span>, <span class="st">&quot;Pr(&gt;|t|)&quot;</span>),</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>      <span class="at">caption =</span> <span class="st">&quot;Linear Model Coefficients for Anchovy Landings&quot;</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
 <table class="caption-top table table-sm table-striped small" data-quarto-postprocess="true">
@@ -3366,7 +3344,7 @@ F-statistic: 131.3 on 3 and 48404 DF,  p-value: &lt; 2.2e-16</code></pre>
 <thead>
 <tr class="header">
 <th style="text-align: left;" data-quarto-table-cell-role="th"></th>
-<th style="text-align: right;" data-quarto-table-cell-role="th">Estimate</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">Coefficient</th>
 <th style="text-align: right;" data-quarto-table-cell-role="th">Std. Error</th>
 <th style="text-align: right;" data-quarto-table-cell-role="th">T-value</th>
 <th style="text-align: right;" data-quarto-table-cell-role="th">Pr(&gt;|t|)</th>
@@ -3408,23 +3386,16 @@ F-statistic: 131.3 on 3 and 48404 DF,  p-value: &lt; 2.2e-16</code></pre>
 </div>
 </div>
 </section>
-<section id="interpretation-of-the-did-coefficients" class="level1" data-number="4">
-<h1 data-number="4"><span class="header-section-number">4</span> Interpretation of the DiD Coefficients:</h1>
-<div class="cell">
-<details class="code-fold">
-<summary>Code</summary>
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co">#calculate percentage change in NC landings</span></span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>percentage_change <span class="ot">&lt;-</span> <span class="fu">exp</span>(<span class="fu">coef</span>(lm_anchovy)[<span class="dv">4</span>]) <span class="sc">-</span> <span class="dv">1</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
-</div>
+<section id="interpretation-of-the-did-coefficient" class="level1" data-number="4">
+<h1 data-number="4"><span class="header-section-number">4</span> Interpretation of the DiD Coefficient:</h1>
 <p>The coefficient estimates from the linear regression model indicate the following:</p>
 <ul>
 <li>The intercept of 4.603 represents the log-transformed value of anchovy landings in the South zone before the policy was implemented.</li>
-<li>The coefficient for ‘north’ of 0.311 indicates that landings in the North Central zone were 31.1% higher than the South zone before the policy was implemented.</li>
-<li>After the policy, landings increase by 17.1% in both zones, as shown by the ‘post’ coefficient of 0.171.</li>
-<li>However, the differences-in-differences (DiD) estimate of -0.176 suggests a 17.6% decrease in landings in the NC zone relative to the South zone after the policy.</li>
+<li>The coefficient for ‘north’ of 0.311 indicates that log of landings in the North Central zone were higher than the South zone.</li>
+<li>After the policy, the log of landings increase by 0.171 in both zones, as shown by the ‘post’ coefficient.</li>
+<li>However, the differences-in-differences (DiD) estimate of -0.176 suggests a decrease in the log-transformed landings in the NC zone relative to the South zone after the policy.</li>
 <li>High T values for all coefficients indicate that the estimates are statistically significant.</li>
-<li>While both zones experienced increases in landings, the IVQ policy had a negative impact in the NC zone, reducing landings by 16.2% compared to what might have been expected in the South zone.</li>
+<li>While both zones experienced increases in landings, the IVQ policy decreased the impact in the NC zone, reducing landings compared to what might have been expected in the South zone.</li>
 </ul>
 </section>
 <section id="analysis" class="level1" data-number="5">
@@ -3432,7 +3403,7 @@ F-statistic: 131.3 on 3 and 48404 DF,  p-value: &lt; 2.2e-16</code></pre>
 <section id="question-1" class="level3" data-number="5.0.1">
 <h3 data-number="5.0.1" class="anchored" data-anchor-id="question-1"><span class="header-section-number">5.0.1</span> <em>Question 1:</em></h3>
 <p><em>We used the South as a counterfactual region because the policy wasn’t applied there. Describe one or more possible problems with this assumption.</em></p>
-<p>There could be other variables at play - for example what if there was a storm in the North that caused a decrease in landings.</p>
+<p>There could be other influential factors besides time and policy, such as environmental variables, advancements in fishing technology, and fluctuations in demand for fish. Additionally, natural population dynamics, like stochastic fluctuations, might also contribute to changes in fish populations, independent of the policy.</p>
 <p>What is the landings were decreasing naturally?</p>
 </section>
 <section id="question-2" class="level3" data-number="5.0.2">
@@ -3441,15 +3412,15 @@ F-statistic: 131.3 on 3 and 48404 DF,  p-value: &lt; 2.2e-16</code></pre>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co">#take the mean of log_landing before and after the policy for each zone</span></span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>mean_anchovy_data <span class="ot">&lt;-</span> log_anchovy_data <span class="sc">%&gt;%</span></span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(zone, post) <span class="sc">%&gt;%</span></span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">mean_log_landing =</span> <span class="fu">mean</span>(log_landing))</span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="co">#summarize in a kable table</span></span>
-<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(mean_anchovy_data, <span class="at">digits =</span> <span class="dv">3</span>, </span>
-<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>      <span class="at">col.names =</span> <span class="fu">c</span>(<span class="st">&quot;Zone&quot;</span>, <span class="st">&quot;Post&quot;</span>, <span class="st">&quot;Mean Log Landing&quot;</span>), </span>
-<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>      <span class="at">caption =</span> <span class="st">&quot;Mean Log Landing Before and After the Policy for Each Zone&quot;</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co">#take the mean of log_landing before and after the policy for each zone</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>mean_anchovy_data <span class="ot">&lt;-</span> log_anchovy_data <span class="sc">%&gt;%</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(zone, post) <span class="sc">%&gt;%</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">mean_log_landing =</span> <span class="fu">mean</span>(log_landing))</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="co">#summarize in a kable table</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(mean_anchovy_data, <span class="at">digits =</span> <span class="dv">3</span>, </span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>      <span class="at">col.names =</span> <span class="fu">c</span>(<span class="st">&quot;Zone&quot;</span>, <span class="st">&quot;Post&quot;</span>, <span class="st">&quot;Mean Log Landing&quot;</span>), </span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>      <span class="at">caption =</span> <span class="st">&quot;Mean Log Landing Before and After the Policy for Each Zone&quot;</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
 <table class="caption-top table table-sm table-striped small" data-quarto-postprocess="true">
@@ -3492,6 +3463,8 @@ F-statistic: 131.3 on 3 and 48404 DF,  p-value: &lt; 2.2e-16</code></pre>
 <section id="question-3" class="level3" data-number="5.0.3">
 <h3 data-number="5.0.3" class="anchored" data-anchor-id="question-3"><span class="header-section-number">5.0.3</span> <em>Question 3:</em></h3>
 <p><em>Does the parallel trends assumption seem to hold? What are the implications of this for your analysis</em>?</p>
+<p>The parallel trends assumption—that the North and South zones would have followed similar trends in the absence of the policy—appears to hold based on both the increasing regression trends and the mean log landings before the policy. Both regression lines show increasing trends, suggesting parallel movement across the zones. However, the means reveal a key difference: while the South zone shows an increase in landings after the policy, the North zone remains steady or slightly decreases.</p>
+<p>This indicates that the policy had a differential effect on the North zone, and the South zone serves as a strong counterfactual for evaluating the policy’s impact.</p>
 </section>
 </section>
 

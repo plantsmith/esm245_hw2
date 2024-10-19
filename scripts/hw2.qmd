@@ -73,10 +73,6 @@ kable(summary(lm_anchovy)$coefficients, digits = 3,
       col.names = c("Coefficient", "Std. Error", "T-value", "Pr(>|t|)"),
       caption = "Linear Model Coefficients for Anchovy Landings")
 ```
-```{r}
-ggplot(log_anchovy_data, aes(x = year, y = log_landing, color = zone)) +
-  geom_line() 
-```
 
 # Interpretation of the DiD Coefficient:
 
@@ -120,6 +116,7 @@ kable(mean_anchovy_data, digits = 3,
 ### *Question 3:*
 
 *Does the parallel trends assumption seem to hold? What are the implications of this for your analysis*?
+
 The parallel trends assumption—that the North and South zones would have followed similar trends in the absence of the policy—appears to hold based on both the increasing regression trends and the mean log landings before the policy. Both regression lines show increasing trends, suggesting parallel movement across the zones. However, the means reveal a key difference: while the South zone shows an increase in landings after the policy, the North zone remains steady or slightly decreases.
 
 This indicates that the policy had a differential effect on the North zone, and the South zone serves as a strong counterfactual for evaluating the policy's impact.
