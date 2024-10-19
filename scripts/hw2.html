@@ -3324,18 +3324,41 @@ Landing_{tg} = \alpha + \beta_0 North_{g} + \beta_1Post_{t} + \beta_3North_{g}Po
 <span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a><span class="co">#Create the interaction between the time the treatment started and the treatment group</span></span>
 <span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>log_anchovy_data <span class="ot">&lt;-</span> log_anchovy_data <span class="sc">%&gt;%</span> </span>
-<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">did =</span> post<span class="sc">*</span>north)</span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">did =</span> post<span class="sc">*</span>north) <span class="co">#where its after 2009 and its the north zone</span></span>
 <span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a><span class="co">#Run a linear regression using the functional form proposed above</span></span>
-<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>lm_anchovy <span class="ot">&lt;-</span> <span class="fu">lm</span>(log_landing <span class="sc">~</span> north <span class="sc">+</span> post <span class="sc">+</span> did, <span class="at">data =</span> log_anchovy_data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>lm_anchovy <span class="ot">&lt;-</span> <span class="fu">lm</span>(log_landing <span class="sc">~</span> north <span class="sc">+</span> post <span class="sc">+</span> did, <span class="at">data =</span> log_anchovy_data) </span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(lm_anchovy)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+lm(formula = log_landing ~ north + post + did, data = log_anchovy_data)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-6.3833 -0.7403  0.0665  0.8724  3.2187 
+
+Coefficients:
+            Estimate Std. Error t value Pr(&gt;|t|)    
+(Intercept)  4.60265    0.01477 311.650  &lt; 2e-16 ***
+north        0.31099    0.01745  17.824  &lt; 2e-16 ***
+post         0.17116    0.02087   8.202 2.43e-16 ***
+did         -0.17615    0.02466  -7.144 9.18e-13 ***
+---
+Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+
+Residual standard error: 1.223 on 48404 degrees of freedom
+Multiple R-squared:  0.008073,  Adjusted R-squared:  0.008011 
+F-statistic: 131.3 on 3 and 48404 DF,  p-value: &lt; 2.2e-16</code></pre>
+</div>
 </div>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(<span class="fu">summary</span>(lm_anchovy)<span class="sc">$</span>coefficients, <span class="at">digits =</span> <span class="dv">3</span>, </span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>      <span class="at">col.names =</span> <span class="fu">c</span>(<span class="st">&quot;Estimate&quot;</span>, <span class="st">&quot;Std. Error&quot;</span>, <span class="st">&quot;T-value&quot;</span>, <span class="st">&quot;Pr(&gt;|t|)&quot;</span>), <span class="co"># Rename columns</span></span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>      <span class="at">caption =</span> <span class="st">&quot;Linear Model Coefficients for Anchovy Landings&quot;</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(<span class="fu">summary</span>(lm_anchovy)<span class="sc">$</span>coefficients, <span class="at">digits =</span> <span class="dv">3</span>, </span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>      <span class="at">col.names =</span> <span class="fu">c</span>(<span class="st">&quot;Estimate&quot;</span>, <span class="st">&quot;Std. Error&quot;</span>, <span class="st">&quot;T-value&quot;</span>, <span class="st">&quot;Pr(&gt;|t|)&quot;</span>),</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>      <span class="at">caption =</span> <span class="st">&quot;Linear Model Coefficients for Anchovy Landings&quot;</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
 <table class="caption-top table table-sm table-striped small" data-quarto-postprocess="true">
@@ -3390,8 +3413,8 @@ Landing_{tg} = \alpha + \beta_0 North_{g} + \beta_1Post_{t} + \beta_3North_{g}Po
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co">#calculate percentage change in NC landings</span></span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>percentage_change <span class="ot">&lt;-</span> <span class="fu">exp</span>(<span class="fu">coef</span>(lm_anchovy)[<span class="dv">4</span>]) <span class="sc">-</span> <span class="dv">1</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co">#calculate percentage change in NC landings</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>percentage_change <span class="ot">&lt;-</span> <span class="fu">exp</span>(<span class="fu">coef</span>(lm_anchovy)[<span class="dv">4</span>]) <span class="sc">-</span> <span class="dv">1</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 <p>The coefficient estimates from the linear regression model indicate the following:</p>
@@ -3418,15 +3441,15 @@ Landing_{tg} = \alpha + \beta_0 North_{g} + \beta_1Post_{t} + \beta_3North_{g}Po
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co">#take the mean of log_landing before and after the policy for each zone</span></span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>mean_anchovy_data <span class="ot">&lt;-</span> log_anchovy_data <span class="sc">%&gt;%</span></span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(zone, post) <span class="sc">%&gt;%</span></span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">mean_log_landing =</span> <span class="fu">mean</span>(log_landing))</span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="co">#summarize in a kable table</span></span>
-<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(mean_anchovy_data, <span class="at">digits =</span> <span class="dv">3</span>, </span>
-<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>      <span class="at">col.names =</span> <span class="fu">c</span>(<span class="st">&quot;Zone&quot;</span>, <span class="st">&quot;Post&quot;</span>, <span class="st">&quot;Mean Log Landing&quot;</span>), </span>
-<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>      <span class="at">caption =</span> <span class="st">&quot;Mean Log Landing Before and After the Policy for Each Zone&quot;</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co">#take the mean of log_landing before and after the policy for each zone</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>mean_anchovy_data <span class="ot">&lt;-</span> log_anchovy_data <span class="sc">%&gt;%</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(zone, post) <span class="sc">%&gt;%</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">mean_log_landing =</span> <span class="fu">mean</span>(log_landing))</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="co">#summarize in a kable table</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(mean_anchovy_data, <span class="at">digits =</span> <span class="dv">3</span>, </span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>      <span class="at">col.names =</span> <span class="fu">c</span>(<span class="st">&quot;Zone&quot;</span>, <span class="st">&quot;Post&quot;</span>, <span class="st">&quot;Mean Log Landing&quot;</span>), </span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>      <span class="at">caption =</span> <span class="st">&quot;Mean Log Landing Before and After the Policy for Each Zone&quot;</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
 <table class="caption-top table table-sm table-striped small" data-quarto-postprocess="true">

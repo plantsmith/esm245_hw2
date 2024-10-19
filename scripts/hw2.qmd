@@ -24,7 +24,7 @@ We aim to assess whether the IVQ had a causal effect on harvest levels, using th
 
 ![Figure 1: Arias Schreiber and Halliday, 2013](images/anchovy_map.png){fig-align="left" width="384"}
 
-# Prepare Libraries & Data: 
+# Prepare Libraries & Data:
 
 ```{r}
 library(tidyverse)
@@ -43,7 +43,7 @@ anchovy_data <- read_csv(here("data", "df_peru.csv"))
 We first created a new variable called 'log_landing' by taking the logarithm of the 'landing' variable. Then, we created two dummy variables: one named 'post' to indicate when the treatment began (1 for 2009 and after, 0 for before), and another variable called 'north' to identify the group exposed to the treatment (1 for NC and 0 for S). Next, we created an interaction between these variables called 'did' (differences-in-differences). This interaction variable is equal to 1 only for observations that are both in the treatment group and occur after the treatment started. Finally, we performed a linear regression based on the functional form below:
 
 $$
-Landing_{tg} = \alpha + \beta_0 North_{g} + \beta_1Post_{t} + \beta_3North_{g}Post_{t} + \epsilon_{tg}
+Landing_{tg} = \alpha + \beta_0 North_{g} + \beta_1Post_{t} + \beta_2North_{g}Post_{t} + \epsilon_{tg}
 $$
 
 ```{r}
@@ -61,45 +61,45 @@ log_anchovy_data <- log_anchovy_data %>%
 
 #Create the interaction between the time the treatment started and the treatment group
 log_anchovy_data <- log_anchovy_data %>% 
-  mutate(did = post*north)
+  mutate(did = post*north) #where its after 2009 and its the north zone
 
 #Run a linear regression using the functional form proposed above
-lm_anchovy <- lm(log_landing ~ north + post + did, data = log_anchovy_data)
+lm_anchovy <- lm(log_landing ~ north + post + did, data = log_anchovy_data) 
+# summary(lm_anchovy)
 ```
 
 ```{r}
 kable(summary(lm_anchovy)$coefficients, digits = 3, 
-      col.names = c("Estimate", "Std. Error", "T-value", "Pr(>|t|)"), # Rename columns
+      col.names = c("Coefficient", "Std. Error", "T-value", "Pr(>|t|)"),
       caption = "Linear Model Coefficients for Anchovy Landings")
 ```
-
-# Interpretation of the DiD Coefficients:
-
 ```{r}
-#calculate percentage change in NC landings
-percentage_change <- exp(coef(lm_anchovy)[4]) - 1
+ggplot(log_anchovy_data, aes(x = year, y = log_landing, color = zone)) +
+  geom_line() 
 ```
+
+# Interpretation of the DiD Coefficient:
 
 The coefficient estimates from the linear regression model indicate the following:
 
 -   The intercept of 4.603 represents the log-transformed value of anchovy landings in the South zone before the policy was implemented.
--   The coefficient for 'north' of 0.311 indicates that landings in the North Central zone were 31.1% higher than the South zone before the policy was implemented.
--   After the policy, landings increase by 17.1% in both zones, as shown by the 'post' coefficient of 0.171.
--   However, the differences-in-differences (DiD) estimate of -0.176 suggests a 17.6% decrease in landings in the NC zone relative to the South zone after the policy.
+-   The coefficient for 'north' of 0.311 indicates that log of landings in the North Central zone were higher than the South zone.
+-   After the policy, the log of landings increase by 0.171 in both zones, as shown by the 'post' coefficient.
+-   However, the differences-in-differences (DiD) estimate of -0.176 suggests a decrease in the log-transformed landings in the NC zone relative to the South zone after the policy.
 -   High T values for all coefficients indicate that the estimates are statistically significant.
--   While both zones experienced increases in landings, the IVQ policy had a negative impact in the NC zone, reducing landings by 16.2% compared to what might have been expected in the South zone.
+-   While both zones experienced increases in landings, the IVQ policy decreased the impact in the NC zone, reducing landings compared to what might have been expected in the South zone.
 
 # Analysis
 
-### *Question 1:* 
+### *Question 1:*
 
-*We used the South as a counterfactual region because the policy wasn’t applied there. Describe one or more possible problems with this assumption.*
+*We used the South as a counterfactual region because the policy wasn't applied there. Describe one or more possible problems with this assumption.*
 
-There could be other variables at play - for example what if there was a storm in the North that caused a decrease in landings.
+There could be other influential factors besides time and policy, such as environmental variables, advancements in fishing technology, and fluctuations in demand for fish. Additionally, natural population dynamics, like stochastic fluctuations, might also contribute to changes in fish populations, independent of the policy.
 
 What is the landings were decreasing naturally?
 
-### *Question 2:* 
+### *Question 2:*
 
 *To analyze whether the counterfactual makes sense, take the mean of log_landing before and after the policy for each zone. Show your results in a table.*
 
@@ -117,6 +117,10 @@ kable(mean_anchovy_data, digits = 3,
 
 ```
 
-### *Question 3:* 
+### *Question 3:*
 
 *Does the parallel trends assumption seem to hold? What are the implications of this for your analysis*?
+The parallel trends assumption—that the North and South zones would have followed similar trends in the absence of the policy—appears to hold based on both the increasing regression trends and the mean log landings before the policy. Both regression lines show increasing trends, suggesting parallel movement across the zones. However, the means reveal a key difference: while the South zone shows an increase in landings after the policy, the North zone remains steady or slightly decreases.
+
+This indicates that the policy had a differential effect on the North zone, and the South zone serves as a strong counterfactual for evaluating the policy's impact.
+
